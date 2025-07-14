@@ -3,25 +3,23 @@ version: 0.2
 phases:
   pre_build:
     commands:
-       - echo Logging / auth in to Amazon ECR
-       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 727646494579.dkr.ecr.us-east-1.amazonaws.com
-
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 727646494579.dkr.ecr.us-east-1.amazonaws.com
+      - REPOSITORY_URI=727646494579.dkr.ecr.us-east-1.amazonaws.com/netclick-image
+      - echo REPOSITORY_URI=727646494579.dkr.ecr.us-east-1.amazonaws.com/netclick-image
   build:
     commands:
-      - echo Build started
-      - echo Building the docker image
+      - echo Build started on `date`
+      - echo Building the Docker image...
       - docker build -t netclick-image .
       - docker tag netclick-image:latest 727646494579.dkr.ecr.us-east-1.amazonaws.com/netclick-image:latest
-
-
   post_build:
     commands:
-     - echo build completed
-     - echo pushing in to docker ECR...
-     - docker push 727646494579.dkr.ecr.us-east-1.amazonaws.com/netclick-image:latest
-     - echo Writing image definition file..
-     - printf '[{"name":"%s","imageUri":"%s"}]' "netclick-cluster" "727646494579.dkr.ecr.us-east-1.amazonaws.com/netclick-image" > imagedefinitions.json
-
+      - echo Pushing the Docker image to ECR...
+      -docker push 727646494579.dkr.ecr.us-east-1.amazonaws.com/netclick-image:latest
+      - echo Writing image definitions file...
+      - printf '[{"name":"%s","imageUri":"%s"}]' "netclick-cluster" "727646494579.dkr.ecr.us-east-1.amazonaws.com/netclick-image" > imagedefinitions.json
 
 artifacts:
   files:
